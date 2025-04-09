@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conference Reminder App</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-6">Conference Advance Reminder</h1>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded-lg shadow-md mb-6">
+      <label class="block mb-2 font-semibold">Upload Excel File:</label>
+      <input type="file" name="excel" required class="mb-4 border p-2 rounded w-full" />
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Upload</button>
+    </form>
+
+    <div class="bg-white p-4 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Uploaded Conference Data</h2>
+      <table id="data-table" class="min-w-full table-auto border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border px-4 py-2">Name</th>
+            <th class="border px-4 py-2">Email</th>
+            <th class="border px-4 py-2">Conference</th>
+            <th class="border px-4 py-2">Date</th>
+            <th class="border px-4 py-2">Notified</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Filled dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function fetchData() {
+      fetch('/data')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('table-body');
+          tbody.innerHTML = '';
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="border px-4 py-2">${row.name}</td>
+              <td class="border px-4 py-2">${row.email}</td>
+              <td class="border px-4 py-2">${row.conference}</td>
+              <td class="border px-4 py-2">${new Date(row.date).toLocaleDateString()}</td>
+              <td class="border px-4 py-2">${row.notified ? '✅' : '❌'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+    }
+
+    // Initial fetch
+    fetchData();
+
+    // Poll every 30 seconds to reflect changes
+    setInterval(fetchData, 30000);
+  </script>
+</body>
+</html>
